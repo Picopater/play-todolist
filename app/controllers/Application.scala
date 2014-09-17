@@ -15,4 +15,8 @@ object Application extends Controller {
   def newTask = TODO
   def deleteTask(id: Long) = TODO
 
+  val taskForm = Form(
+    "label" -> nonEmptyText
+  )
+
 }
