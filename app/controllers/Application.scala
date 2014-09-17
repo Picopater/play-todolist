@@ -6,7 +6,15 @@ import play.api.mvc._
 object Application extends Controller {
 
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    //Ok(views.html.index("Your new application is ready."))
+    Ok("Hello World")
   }
 
+  def index = Action {
+   Redirect(routes.Application.tasks)
+  }
+
+  def tasks = TODO
+  def newTask = TODO
+  def deleteTask(id: Long) = TODO
 }
