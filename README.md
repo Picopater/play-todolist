@@ -1,5 +1,6 @@
 #Play TodoList
 
-No veo la pantallla
+No veo la pantalla
 
-Pendiente: Subilo a Heroku
+URL de la app en heroku
+http://desolate-lowlands-4754.herokuapp.com/
