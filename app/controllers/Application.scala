@@ -19,13 +19,17 @@ object Application extends Controller {
     (JsPath \ "label").write[String]
   )(unlift(Task.unapply))
 
-  def index = TODO /*Action {
-   Redirect(routes.Application.tasks)
+  def index = Action {
+   Ok(views.html.index(Task.all(), taskForm))
   }
-  */
 
   def tasks = Action {
-    Ok(views.html.index(Task.all(), taskForm))
+    val list = Task.all
+    if(!list.isEmpty) {
+      val json = Json.toJson(list)
+      Ok(json)
+    }
+    else NotFound
   }
   
 
@@ -36,9 +40,8 @@ object Application extends Controller {
         val result = Task.create(label)
         result match {
           case Some(x) => Created(Json.toJson(result))
-          case None => Error("No encuentra el ultimo task que se inserto") // si falla al insertar?
+          case None => NotFound("No encuentra el ultimo task que se inserto") // si falla al insertar?
         }
-        
       }
     )
   }

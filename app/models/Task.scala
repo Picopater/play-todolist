@@ -15,7 +15,7 @@ object Task {
    }
   
    def all(): List[Task] = DB.withConnection { implicit c =>
-      SQL("select * from task").as(task *)
+      SQL("select * from task").as(task *) // TODO mostrar notfound?
    }
   
    def create(label: String) : Option[Task] = {
@@ -25,7 +25,7 @@ object Task {
        ).executeInsert()
       } match {
         case Some(id) => read(id)
-        case _ => Error("Fallo al insertar") // fallo al insertar?
+        case _ => None // fallo al insertar?
       }
       
    }
