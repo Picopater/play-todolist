@@ -18,12 +18,16 @@ object Task {
       SQL("select * from task").as(task *)
    }
   
-   def create(label: String) {
+   def create(label: String) : Option[Task] = {
       DB.withConnection { implicit c =>
        SQL("insert into task (label) values ({label})").on(
          'label -> label
-       ).executeUpdate()
+       ).executeInsert()
+      } match {
+        case Some(id) => read(id)
+        case _ => Error("Fallo al insertar") // fallo al insertar?
       }
+      
    }
   
    def delete(id: Long) {

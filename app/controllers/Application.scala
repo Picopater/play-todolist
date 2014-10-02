@@ -33,8 +33,12 @@ object Application extends Controller {
     taskForm.bindFromRequest.fold(
       errors => BadRequest(views.html.index(Task.all(), errors)),
       label => {
-        Task.create(label)
-        Redirect(routes.Application.tasks)
+        val result = Task.create(label)
+        result match {
+          case Some(x) => Created(Json.toJson(result))
+          case None => Error("No encuentra el ultimo task que se inserto") // si falla al insertar?
+        }
+        
       }
     )
   }
