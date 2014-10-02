@@ -33,5 +33,12 @@ object Task {
        ).executeUpdate()
       }
    }
-  
+
+   def read(id: Long): Option[Task] = {
+      DB.withConnection { implicit c =>
+        SQL("select * from task where id = {id}").on(
+          'id -> id
+          ).as(Task.task.singleOpt)
+      }
+   }
 }
