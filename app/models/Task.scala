@@ -14,9 +14,15 @@ object Task {
        case id~label~userid => Task(id, label, userid)
       }
    }
-  
-   def all(): List[Task] = DB.withConnection { implicit c =>
-      SQL("select * from task where userid=0").as(task *) // TODO mostrar notfound?
+
+   def all(login: String): List[Task] = DB.withConnection { implicit c =>
+
+      val userid = SQL("select id from usertask where username={login}").on(
+          'login -> login
+        ).as(scalar[Long].singleOpt)
+      SQL("select * from task where userid={userid}").on(
+        'userid -> userid
+      ).as(task *) // TODO mostrar notfound?
    }
   
    def create(label: String) : Option[Task] = {

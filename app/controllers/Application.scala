@@ -21,22 +21,25 @@ object Application extends Controller {
   )(unlift(Task.unapply))
 
   def index = Action {
-   Ok(views.html.index(Task.all(), taskForm))
+   Ok(views.html.index(Task.all("guest"), taskForm))
   }
 
-  def tasks = Action {
-    val list = Task.all
-    if(!list.isEmpty) {
-      val json = Json.toJson(list)
-      Ok(json)
-    }
-    else NotFound
+  def tasks(login: String) = Action {
+    //if(login == "guest") {
+      val list = Task.all(login)
+      if(!list.isEmpty) { // TODO mostrar lista vacia o notfound??
+        val json = Json.toJson(list)
+        Ok(json)
+      }
+      else NotFound
+    //} else {
+
+    //}
   }
-  
 
   def newTask = Action { implicit request =>
     taskForm.bindFromRequest.fold(
-      errors => BadRequest(views.html.index(Task.all(), errors)),
+      errors => BadRequest(views.html.index(Task.all("guest"), errors)),
       label => {
         val result = Task.create(label)
         result match {
