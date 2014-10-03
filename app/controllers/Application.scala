@@ -16,28 +16,29 @@ object Application extends Controller {
 
   implicit val taskWrites: Writes[Task] = (
     (JsPath \ "id").write[Long] and
-    (JsPath \ "label").write[String]
+    (JsPath \ "label").write[String] and
+    (JsPath \ "userid").write[Long] and
+    (JsPath \ "username").write[String]
   )(unlift(Task.unapply))
 
   def index = Action {
-   Ok(views.html.index(Task.all(), taskForm))
+   Ok(views.html.index(Task.all("guest"), taskForm))
   }
 
-  def tasks = Action {
-    val list = Task.all
-    if(!list.isEmpty) {
+  def tasks(login: String) = Action {
+    val list = Task.all(login)
+    if(!list.isEmpty) { // TODO mostrar lista vacia o notfound??
       val json = Json.toJson(list)
       Ok(json)
     }
     else NotFound
   }
-  
 
-  def newTask = Action { implicit request =>
+  def newTask(login: String) = Action { implicit request =>
     taskForm.bindFromRequest.fold(
-      errors => BadRequest(views.html.index(Task.all(), errors)),
+      errors => BadRequest(views.html.index(Task.all("guest"), errors)),
       label => {
-        val result = Task.create(label)
+        val result = Task.create(label, login)
         result match {
           case Some(x) => Created(Json.toJson(result))
           case None => NotFound("No encuentra el ultimo task que se inserto") // si falla al insertar?
@@ -50,7 +51,6 @@ object Application extends Controller {
     if(Task.delete(id) > 0) Ok
     else NotFound
   }
-
 
 
   def task(id: Long) = Action {
