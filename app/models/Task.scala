@@ -4,23 +4,24 @@ import anorm.SqlParser._
 import play.api.db._
 import play.api.Play.current
 
-case class Task(id: Long, label: String)
+case class Task(id: Long, label: String, userid: Long)
 
 object Task {
    val task = {
       get[Long]("id") ~ 
-      get[String]("label") map {
-       case id~label => Task(id, label)
+      get[String]("label") ~
+      get[Long]("userid") map {
+       case id~label~userid => Task(id, label, userid)
       }
    }
   
    def all(): List[Task] = DB.withConnection { implicit c =>
-      SQL("select * from task").as(task *) // TODO mostrar notfound?
+      SQL("select * from task where userid=0").as(task *) // TODO mostrar notfound?
    }
   
    def create(label: String) : Option[Task] = {
       DB.withConnection { implicit c =>
-       SQL("insert into task (label) values ({label})").on(
+       SQL("insert into task (label, userid) values ({label},0)").on(
          'label -> label
        ).executeInsert()
       } match {
@@ -31,7 +32,7 @@ object Task {
   
    def delete(id: Long): Int = {
       DB.withConnection { implicit c =>
-       SQL("delete from task where id = {id}").on(
+       SQL("delete from task where id = {id} and userid=0").on(
          'id -> id
        ).executeUpdate()
       }
@@ -39,7 +40,7 @@ object Task {
 
    def read(id: Long): Option[Task] = {
       DB.withConnection { implicit c =>
-        SQL("select * from task where id = {id}").on(
+        SQL("select * from task where id = {id} and userid=0").on(
           'id -> id
           ).as(Task.task.singleOpt)
       }
