@@ -27,10 +27,9 @@ object Task {
         case Some(id) => read(id)
         case _ => None // fallo al insertar?
       }
-      
    }
   
-   def delete(id: Long) {
+   def delete(id: Long): Int = {
       DB.withConnection { implicit c =>
        SQL("delete from task where id = {id}").on(
          'id -> id

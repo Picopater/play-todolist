@@ -47,8 +47,8 @@ object Application extends Controller {
   }
   
   def deleteTask(id: Long) = Action {
-    Task.delete(id)
-    Redirect(routes.Application.tasks)
+    if(Task.delete(id) > 0) Ok
+    else NotFound
   }
 
 
