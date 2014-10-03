@@ -4,14 +4,15 @@ import anorm.SqlParser._
 import play.api.db._
 import play.api.Play.current
 
-case class Task(id: Long, label: String, userid: Long)
+case class Task(id: Long, label: String, userid: Long, username: String)
 
 object Task {
    val task = {
       get[Long]("id") ~ 
       get[String]("label") ~
-      get[Long]("userid") map {
-       case id~label~userid => Task(id, label, userid)
+      get[Long]("userid") ~ 
+      get[String]("username") map {
+       case id~label~userid~username => Task(id, label, userid, username)
       }
    }
 
@@ -19,7 +20,7 @@ object Task {
       val userid = SQL("select id from usertask where username={login}").on(
           'login -> login
         ).as(scalar[Long].singleOpt)
-      SQL("select * from task where userid={userid}").on(
+      SQL("select task.*, usertask.username  from task, usertask where userid={userid} and userid=usertask.id").on(
         'userid -> userid
       ).as(task *) // TODO mostrar notfound?
    }
@@ -49,7 +50,7 @@ object Task {
 
    def read(id: Long): Option[Task] = {
       DB.withConnection { implicit c =>
-        SQL("select * from task where id = {id}").on(
+        SQL("select task.*, usertask.username from task, usertask where task.id = {id} and task.userid=usertask.id").on(
           'id -> id
           ).as(Task.task.singleOpt)
       }

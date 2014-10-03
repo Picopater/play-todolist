@@ -17,7 +17,8 @@ object Application extends Controller {
   implicit val taskWrites: Writes[Task] = (
     (JsPath \ "id").write[Long] and
     (JsPath \ "label").write[String] and
-    (JsPath \ "userid").write[Long]
+    (JsPath \ "userid").write[Long] and
+    (JsPath \ "username").write[String]
   )(unlift(Task.unapply))
 
   def index = Action {
@@ -50,7 +51,6 @@ object Application extends Controller {
     if(Task.delete(id) > 0) Ok
     else NotFound
   }
-
 
 
   def task(id: Long) = Action {
