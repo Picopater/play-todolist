@@ -16,7 +16,6 @@ object Task {
    }
 
    def all(login: String): List[Task] = DB.withConnection { implicit c =>
-
       val userid = SQL("select id from usertask where username={login}").on(
           'login -> login
         ).as(scalar[Long].singleOpt)
@@ -25,14 +24,18 @@ object Task {
       ).as(task *) // TODO mostrar notfound?
    }
   
-   def create(label: String) : Option[Task] = {
+   def create(label: String, login: String) : Option[Task] = {
       DB.withConnection { implicit c =>
-       SQL("insert into task (label, userid) values ({label},0)").on(
-         'label -> label
+      val userid = SQL("select id from usertask where username={login}").on(
+          'login -> login
+      ).as(scalar[Long].singleOpt)
+      SQL("insert into task (label, userid) values ({label},{userid})").on(
+         'label -> label,
+         'userid -> userid
        ).executeInsert()
       } match {
         case Some(id) => read(id)
-        case _ => None // fallo al insertar?
+        case _ => None // fallo db al insertar?
       }
    }
   
@@ -46,7 +49,7 @@ object Task {
 
    def read(id: Long): Option[Task] = {
       DB.withConnection { implicit c =>
-        SQL("select * from task where id = {id} and userid=0").on(
+        SQL("select * from task where id = {id}").on(
           'id -> id
           ).as(Task.task.singleOpt)
       }

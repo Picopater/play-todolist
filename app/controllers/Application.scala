@@ -25,23 +25,19 @@ object Application extends Controller {
   }
 
   def tasks(login: String) = Action {
-    //if(login == "guest") {
-      val list = Task.all(login)
-      if(!list.isEmpty) { // TODO mostrar lista vacia o notfound??
-        val json = Json.toJson(list)
-        Ok(json)
-      }
-      else NotFound
-    //} else {
-
-    //}
+    val list = Task.all(login)
+    if(!list.isEmpty) { // TODO mostrar lista vacia o notfound??
+      val json = Json.toJson(list)
+      Ok(json)
+    }
+    else NotFound
   }
 
-  def newTask = Action { implicit request =>
+  def newTask(login: String) = Action { implicit request =>
     taskForm.bindFromRequest.fold(
       errors => BadRequest(views.html.index(Task.all("guest"), errors)),
       label => {
-        val result = Task.create(label)
+        val result = Task.create(label, login)
         result match {
           case Some(x) => Created(Json.toJson(result))
           case None => NotFound("No encuentra el ultimo task que se inserto") // si falla al insertar?

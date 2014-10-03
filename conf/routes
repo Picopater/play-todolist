@@ -2,22 +2,27 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index
+#--- Home page
+GET   /                 controllers.Application.index
+
 
 #--- rutas para usuario invitado/anonimo
 #Show tasks
-GET     /tasks                  controllers.Application.tasks(login: String = "guest")
-GET   /tasks/:id    controllers.Application.task(id: Long)
+GET   /tasks            controllers.Application.tasks(login: String = "guest")
+GET   /tasks/:id        controllers.Application.task(id: Long)
 
 #Create tasks
-POST    /tasks                  controllers.Application.newTask
+POST  /tasks            controllers.Application.newTask(login: String = "guest")
 
 #Delete tasks
-DELETE    /tasks/:id       controllers.Application.deleteTask(id: Long)
+DELETE   /tasks/:id     controllers.Application.deleteTask(id: Long)
+
 
 #--- rutas para usuarios creados
-GET   /:login/tasks  controllers.Application.tasks(login: String)
+GET   /:login/tasks     controllers.Application.tasks(login: String)
+POST  /:login/tasks            controllers.Application.newTask(login: String)
 
-# Map static resources from the /public folder to the /assets URL path
+
+
+#--- Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
