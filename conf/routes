@@ -8,21 +8,23 @@ GET   /                 controllers.Application.index
 
 #--- rutas para usuario invitado/anonimo
 #Show tasks
-GET   /tasks            controllers.Application.tasks(login: String = "guest")
+GET   /tasks            controllers.Application.tasks
 GET   /tasks/:id        controllers.Application.task(id: Long)
 
 #Create tasks
-POST  /tasks            controllers.Application.newTask(login: String = "guest")
+POST  /tasks            controllers.Application.newTask()
 
 #Delete tasks
 DELETE   /tasks/:id     controllers.Application.deleteTask(id: Long)
 
 
 #--- rutas para usuarios creados
-GET   /:login/tasks     controllers.Application.tasks(login: String)
-POST  /:login/tasks            controllers.Application.newTask(login: String)
+GET   /:login/tasks     controllers.Application.tasksUser(login: String, endate: Option[String])
+POST  /:login/tasks     controllers.Application.newTaskUser(login: String)
 
-
+#--- rutas para funciones auxiliares
+GET /datetasks/:endate        controllers.Application.dateTasks(endate: String)
+PUT   /task/:id        controllers.Application.updateTask(id: Long)
 
 #--- Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
