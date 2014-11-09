@@ -19,7 +19,7 @@ object Task {
    }
 
    def all(): List[Task] = DB.withConnection { implicit c =>
-      SQL("select * from task").as(task *)
+      SQL("select * from task, usertask where task.id=usertask.id").as(task *)
    }
 
    def all(login: String, endate: Option[Date] = None): List[Task] = DB.withConnection { implicit c =>
