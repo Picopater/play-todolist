@@ -76,5 +76,19 @@ class TaskSpec extends Specification {
                 rows must equalTo(1)
           }
         }
+
+        "be listed" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val listedTasks = Task.all()
+                listedTasks.length must equalTo(8)
+
+                val Some(task) = Task.create("specs2 Task 4","guest",Some(strToDate("2014-11-10")))
+
+                val listedTasks2 = Task.all()
+                listedTasks2.length must equalTo(9)
+          }
+        }
+
+        
     }  
 }
