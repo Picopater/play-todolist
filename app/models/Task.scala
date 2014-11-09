@@ -19,7 +19,7 @@ object Task {
    }
 
    def all(): List[Task] = DB.withConnection { implicit c =>
-      SQL("select * from task").as(task *)
+      SQL("select task.*, usertask.username from task, usertask where task.userid=usertask.id").as(task *)
    }
 
    def all(login: String, endate: Option[Date] = None): List[Task] = DB.withConnection { implicit c =>
@@ -84,6 +84,7 @@ object Task {
       }
    }
 
+   //TODO incluir el editar otros campos
    def update(id: Long, endate: Date): Int = {
      DB.withConnection { implicit c =>
        SQL("update task set endate={newEndDate} where id = {id}").on(
