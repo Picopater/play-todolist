@@ -103,5 +103,24 @@ class TaskSpec extends Specification {
                 listedTasks3.length must equalTo(3)
           }
         }
+
+        "be listed by username with endate" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val listedTasks = Task.all("guest", Some(strToDate("2014-01-01")))
+                listedTasks.length must equalTo(0)
+
+                val Some(task) = Task.create("specs2 Task 6","guest",Some(strToDate("2014-11-10")))
+
+                val listedTasks2 = Task.all("guest", Some(strToDate("2014-11-10")))
+                listedTasks2.length must equalTo(1)
+
+                val Some(task2) = Task.create("specs2 Task 7","guest",Some(strToDate("2014-11-10")))
+                val listedTasks4 = Task.all("guest", Some(strToDate("2014-11-10")))
+                listedTasks4.length must equalTo(2)
+
+                val listedTasks3 = Task.all("dmcc", Some(strToDate("2014-11-04")))
+                listedTasks3.length must equalTo(1)
+          }
+        }
     }  
 }
