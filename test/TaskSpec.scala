@@ -48,5 +48,15 @@ class TaskSpec extends Specification {
                 readTask.username must equalTo(task.username)
             }
         }
+
+        "be deleted by id" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val Some(task) = Task.create("specs2 Task 2","guest")
+
+                val rows = Task.delete(task.id)
+                Task.read(task.id) must equalTo(None)
+                rows must equalTo(1)
+          }
+        }
     }  
 }
