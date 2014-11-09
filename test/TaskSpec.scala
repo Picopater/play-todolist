@@ -89,6 +89,19 @@ class TaskSpec extends Specification {
           }
         }
 
-        
+        "be listed by username" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val listedTasks = Task.all("guest")
+                listedTasks.length must equalTo(3)
+
+                val Some(task) = Task.create("specs2 Task 5","guest",Some(strToDate("2014-11-10")))
+
+                val listedTasks2 = Task.all("guest")
+                listedTasks2.length must equalTo(4)
+
+                val listedTasks3 = Task.all("dmcc")
+                listedTasks3.length must equalTo(3)
+          }
+        }
     }  
 }
