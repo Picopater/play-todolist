@@ -17,9 +17,21 @@ class TaskSpec extends Specification {
         
             val Some(task) = Task.read(1)
             task.userid must equalTo(Some(0))
+            task.username must equalTo("guest")
             task.label must equalTo("guest task 1")
             task.endate must equalTo(None)
           }
+        }
+
+        "be created without endate" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val Some(task) = Task.create("specs2 Task","guest")
+
+                task.userid must equalTo(Some(0))
+                task.label must equalTo("specs2 Task")
+                task.endate must equalTo(None)
+                task.username must equalTo("guest")
+            }
         }
     }  
 }
