@@ -8,8 +8,8 @@ import models.Task
 
 class TaskSpec extends Specification {
 
-    //def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str  
-    //def strToDate(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
+    def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str  
+    def strToDate(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
 
     "Task Model" should {
         "be retrieved by id" in {
@@ -27,10 +27,25 @@ class TaskSpec extends Specification {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
                 val Some(task) = Task.create("specs2 Task","guest")
 
-                task.userid must equalTo(Some(0))
-                task.label must equalTo("specs2 Task")
-                task.endate must equalTo(None)
-                task.username must equalTo("guest")
+                val Some(readTask) = Task.read(task.id)
+
+                readTask.userid must equalTo(task.userid)
+                readTask.label must equalTo(task.label)
+                readTask.endate must equalTo(task.endate)
+                readTask.username must equalTo(task.username)
+            }
+        }
+
+        "be created with endate" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val Some(task) = Task.create("specs2 Task","guest",Some(strToDate("2014-11-10")))
+                
+                val Some(readTask) = Task.read(task.id)
+
+                readTask.userid must equalTo(task.userid)
+                readTask.label must equalTo(task.label)
+                readTask.endate must equalTo(task.endate)
+                readTask.username must equalTo(task.username)
             }
         }
     }  
