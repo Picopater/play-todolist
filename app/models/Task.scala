@@ -84,6 +84,7 @@ object Task {
       }
    }
 
+   //TODO incluir el editar otros campos
    def update(id: Long, endate: Date): Int = {
      DB.withConnection { implicit c =>
        SQL("update task set endate={newEndDate} where id = {id}").on(

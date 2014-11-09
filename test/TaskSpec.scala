@@ -58,5 +58,23 @@ class TaskSpec extends Specification {
                 rows must equalTo(1)
           }
         }
+
+        "be updated(only endate) by id" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val Some(task) = Task.create("specs2 Task 3","guest",Some(strToDate("2014-11-10")))
+
+                val rows = Task.update(task.id, strToDate("2014-11-12"))
+
+                val Some(updatedTask) = Task.read(task.id)
+                
+                updatedTask.userid must equalTo(task.userid)
+                updatedTask.label must equalTo(task.label)
+                updatedTask.endate must not equalTo(None)
+                updatedTask.endate must not equalTo(Some(strToDate("2014-11-10")))
+                updatedTask.endate must equalTo(Some(strToDate("2014-11-12")))
+                updatedTask.username must equalTo(task.username)
+                rows must equalTo(1)
+          }
+        }
     }  
 }
