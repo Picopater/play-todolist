@@ -15,8 +15,13 @@ class ApplicationSpec extends Specification {
 
   "Application" should {
 
-    "send 404 on a bad request" in new WithApplication{
-      route(FakeRequest(GET, "/boum")) must beNone
+    "send json with all tasks list on / request " in {
+      running(FakeApplication()) {
+         val Some(root) = route(FakeRequest(GET, "/"))
+
+         status(root) must equalTo(OK)
+         contentType(root) must beSome.which(_ == "application/json") 
+      }
     }
   }
 }
