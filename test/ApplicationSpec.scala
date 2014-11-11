@@ -4,14 +4,16 @@ import org.junit.runner._
 
 import play.api.test._
 import play.api.test.Helpers._
-
+import org.specs2.matcher.JsonMatchers
+import play.api.libs.json.{Json, JsValue, JsArray}
+import models.Task
 /**
  * Add your spec here.
  * You can mock out a whole application including requests, plugins etc.
  * For more information, consult the wiki.
  */
 @RunWith(classOf[JUnitRunner])
-class ApplicationSpec extends Specification {
+class ApplicationSpec extends Specification with JsonMatchers{
 
   "Application" should {
 
@@ -23,5 +25,36 @@ class ApplicationSpec extends Specification {
          contentType(root) must beSome.which(_ == "application/json") 
       }
     }
+
+    "send json with all guest tasks list on /tasks request " in {
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+         // Añadimos un task a los 3 existentes en la evolucion para comprobar que lo contempla
+         val newTask = Task.create("nuevo task", "guest")
+         val Some(guestTasks) = route(FakeRequest(GET, "/tasks"))
+
+         status(guestTasks) must equalTo(OK)
+         contentType(guestTasks) must beSome.which(_ == "application/json")
+
+         val resultJson = contentAsJson(guestTasks)
+         val numGuestTasks = resultJson match {
+            case array: JsArray => array.value.length
+            case _ => None
+         }
+         numGuestTasks must equalTo(4)
+
+         val resultString = Json.stringify(resultJson) 
+
+         resultString must /#(0)/("userid" -> 0)
+         resultString must /#(1)/("userid" -> 0)
+         resultString must /#(2)/("userid" -> 0)
+         resultString must /#(3)/("userid" -> 0)
+         resultString must /#(0)/("username" -> "guest")
+         resultString must /#(1)/("username" -> "guest")
+         resultString must /#(2)/("username" -> "guest")
+         resultString must /#(3)/("username" -> "guest")
+      }
+    }
+
+    
   }
 }
