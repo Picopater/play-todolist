@@ -55,6 +55,22 @@ class ApplicationSpec extends Specification with JsonMatchers{
       }
     }
 
-    
+    "send json with the data of task id requested on /tasks/{id}  " in {
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+         val Some(newTask) = Task.create("nuevo task 2", "dmcc")
+
+         val Some(guestTasks) = route(FakeRequest(GET, "/tasks/"+newTask.id))
+
+         status(guestTasks) must equalTo(OK)
+         contentType(guestTasks) must beSome.which(_ == "application/json")
+
+         val resultJson : JsValue = contentAsJson(guestTasks)
+         val resultString = Json.stringify(resultJson) 
+
+         resultString must /("userid" -> 2)
+         resultString must /("username" -> "dmcc")
+         resultString must /("label" -> "nuevo task 2")
+      }
+    }
   }
 }
