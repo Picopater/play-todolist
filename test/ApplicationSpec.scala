@@ -77,12 +77,12 @@ class ApplicationSpec extends Specification with JsonMatchers{
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
          val Some(newTask) = Task.create("nuevo task 2", "dmcc")
 
-         val Some(guestTasks) = route(FakeRequest(GET, "/tasks/"+newTask.id))
+         val Some(dmccTasks) = route(FakeRequest(GET, "/tasks/"+newTask.id))
 
-         status(guestTasks) must equalTo(OK)
-         contentType(guestTasks) must beSome.which(_ == "application/json")
+         status(dmccTasks) must equalTo(OK)
+         contentType(dmccTasks) must beSome.which(_ == "application/json")
 
-         val resultJson : JsValue = contentAsJson(guestTasks)
+         val resultJson : JsValue = contentAsJson(dmccTasks)
          val resultString = Json.stringify(resultJson) 
 
          resultString must /("userid" -> 2)
@@ -94,10 +94,30 @@ class ApplicationSpec extends Specification with JsonMatchers{
     "send 404 NotFound if id on /tasks/{id} doesn't exists" in {
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
-         val Some(guestTasks) = route(FakeRequest(GET, "/tasks/"+99))
+         val Some(newTask) = route(FakeRequest(GET, "/tasks/"+99))
 
-         status(guestTasks) must equalTo(NOT_FOUND)
+         status(newTask) must equalTo(NOT_FOUND)
       }
     }
+
+    "send Created with the new task on json on request POST /tasks" in {
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+         val Some(newTask) = route(
+            FakeRequest(POST, "/tasks").withFormUrlEncodedBody(("label","nuevo task"))
+         )
+
+         status(newTask) must equalTo(CREATED)
+         contentType(newTask) must beSome.which(_ == "application/json")
+
+         val resultJson : JsValue = contentAsJson(newTask)
+         val resultString = Json.stringify(resultJson) 
+
+         resultString must /("userid" -> 0)
+         resultString must /("username" -> "guest")
+         resultString must /("label" -> "nuevo task")
+      }
+    }
+
+
   }
 }
