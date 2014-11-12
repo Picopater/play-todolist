@@ -201,6 +201,16 @@ class ApplicationSpec extends Specification with JsonMatchers{
       }
     }
 
+    "send NotFound on /{username}/tasks if {username} doesn't exists" in {
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+         val Some(dmccTasks) = route(
+            FakeRequest(GET, "/"+"pepito"+"/tasks")
+            )
+
+         status(dmccTasks) must equalTo(NOT_FOUND)
+      }
+    }
+
     "send Created with the new user task on json on request POST /{username}/tasks" in {
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
          val Some(newTask) = route(
