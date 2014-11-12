@@ -242,14 +242,12 @@ class ApplicationSpec extends Specification with JsonMatchers{
          // Añadimos un task al existente en la evolucion para comprobar que lo contempla
          val Some(newTask2) = Task.create("nuevo task with date", "guest",Some(strToDate("2014-11-08")))
          
-         val Some(dmccTasks) = route(
-            FakeRequest(GET, "/datetasks/"+"2014-11-08")
-            )
+         val Some(dateTasks) = route(FakeRequest(GET, "/datetasks/"+"2014-11-08"))
 
-         status(dmccTasks) must equalTo(OK)
-         contentType(dmccTasks) must beSome.which(_ == "application/json")
+         status(dateTasks) must equalTo(OK)
+         contentType(dateTasks) must beSome.which(_ == "application/json")
 
-         val resultJson = contentAsJson(dmccTasks)
+         val resultJson = contentAsJson(dateTasks)
          val numGuestTasks = resultJson match {
             case array: JsArray => array.value.length
             case _ => None
@@ -265,6 +263,27 @@ class ApplicationSpec extends Specification with JsonMatchers{
          resultString must /#(0)/("endate" -> "2014-11-08")
          resultString must /#(1)/("endate" -> "2014-11-08")
       }
+    }
+
+    "send json with new endate on PUT /tasks/{id} if task already exists and has been edited" in{
+        running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+            val Some(newTask) = Task.create("nuevo task with date", "guest",Some(strToDate("2014-11-08")))
+            
+            val Some(editedTask) = route(
+                FakeRequest(PUT, "/tasks/"+newTask.id+"?endate="+"2014-11-12")
+            )
+
+            status(editedTask) must equalTo(OK)
+            contentType(editedTask) must beSome.which(_ == "application/json")
+
+            val resultJson : JsValue = contentAsJson(editedTask)
+            val resultString = Json.stringify(resultJson) 
+
+            resultString must /("userid" -> 0)
+            resultString must /("username" -> "guest")
+            resultString must /("label" -> "nuevo task with date")
+            resultString must /("endate" -> "2014-11-12")
+        }
     }
 
   }
