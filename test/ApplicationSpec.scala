@@ -77,12 +77,12 @@ class ApplicationSpec extends Specification with JsonMatchers{
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
          val Some(newTask) = Task.create("nuevo task 2", "dmcc")
 
-         val Some(dmccTasks) = route(FakeRequest(GET, "/tasks/"+newTask.id))
+         val Some(dmccTask) = route(FakeRequest(GET, "/tasks/"+newTask.id))
 
-         status(dmccTasks) must equalTo(OK)
-         contentType(dmccTasks) must beSome.which(_ == "application/json")
+         status(dmccTask) must equalTo(OK)
+         contentType(dmccTask) must beSome.which(_ == "application/json")
 
-         val resultJson : JsValue = contentAsJson(dmccTasks)
+         val resultJson : JsValue = contentAsJson(dmccTask)
          val resultString = Json.stringify(resultJson) 
 
          resultString must /("userid" -> 2)
@@ -118,6 +118,17 @@ class ApplicationSpec extends Specification with JsonMatchers{
       }
     }
 
+    "send OK on request DELETE /tasks/{id} if the task was deleted" in {
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        val Some(newTask) = Task.create("nuevo task 3", "dmcc")
+
+        val Some(dmccTask) = route(FakeRequest(DELETE, "/tasks/"+newTask.id))
+
+        status(dmccTask) must equalTo(OK)
+
+        Task.read(newTask.id) must equalTo(None)
+      }
+    }
 
   }
 }
