@@ -203,11 +203,9 @@ class ApplicationSpec extends Specification with JsonMatchers{
 
     "send NotFound on /{username}/tasks if {username} doesn't exists" in {
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
-         val Some(dmccTasks) = route(
-            FakeRequest(GET, "/"+"pepito"+"/tasks")
-            )
+         val Some(request) = route(FakeRequest(GET, "/"+"pepito"+"/tasks"))
 
-         status(dmccTasks) must equalTo(NOT_FOUND)
+         status(request) must equalTo(NOT_FOUND)
       }
     }
 
@@ -226,6 +224,16 @@ class ApplicationSpec extends Specification with JsonMatchers{
          resultString must /("userid" -> 2)
          resultString must /("username" -> "dmcc")
          resultString must /("label" -> "nuevo task dmcc")
+      }
+    }
+
+    "send NotFound on POST /{username}/tasks if {username} doesn't exists" in {
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+         val Some(request) = route(
+            FakeRequest(POST, "/"+"pepito"+"/tasks").withFormUrlEncodedBody(("label","nuevo task pepito"))
+            )
+
+         status(request) must equalTo(NOT_FOUND)
       }
     }
 
