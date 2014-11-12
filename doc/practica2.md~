@@ -1,11 +1,15 @@
-#README - Play TodoList
+#Practica 2 - Play TodoList
 
-Actualmente el servicio también esta desplegado en [Heroku] en el siguiente [enlace] para poder hacer pruebas.
+PENDIENTE
 
 Datos Personales
 ================
 Desarrollador: Daniel M. Campos Carranza
 Profesor: Domingo Gallardo Lopez
 
+
+[Scala]:http://www.scala-lang.org/api/current/#package
+[Play Framework]:https://www.playframework.com/documentation/2.3.x/ScalaHome
+[JSon]:http://json.org/
 [Heroku]:https://www.heroku.com/
 [enlace]:http://secure-chamber-5214.herokuapp.com/
