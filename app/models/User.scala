@@ -33,4 +33,12 @@ object User {
         case _ => None // fallo db al insertar?
       }
    }
+
+   def delete(id: Long): Int = {
+      DB.withConnection { implicit c =>
+       SQL("delete from usertask where id = {id}").on(
+         'id -> id
+       ).executeUpdate()
+      }
+   }
 }

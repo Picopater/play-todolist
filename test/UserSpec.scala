@@ -30,6 +30,16 @@ class UserSpec extends Specification {
                 readUser.id must equalTo(user.id)
                 readUser.username must equalTo(user.username)
             }
-        }
+      }
+
+      "be deleted by id" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val Some(user) = User.create("usuarioNuevo2")
+
+                val rows = User.delete(user.id)
+                User.read(user.id) must equalTo(None)
+                rows must equalTo(1)
+          }
+      }
     }
  }
