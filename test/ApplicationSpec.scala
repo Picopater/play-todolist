@@ -286,5 +286,15 @@ class ApplicationSpec extends Specification with JsonMatchers{
         }
     }
 
+    "send NotFound on PUT /tasks/{id} if task doesn't exists" in{
+        running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+            val Some(editedTask) = route(
+                FakeRequest(PUT, "/tasks/"+99+"?endate="+"2014-11-12")
+            )
+
+            status(editedTask) must equalTo(NOT_FOUND)
+        }
+    }
+
   }
 }
