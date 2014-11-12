@@ -43,14 +43,6 @@ object Task {
        }
      }
    }
-  
-
-  def userExists(login: String): Boolean = {
-    DB.withConnection { implicit c =>
-      SQL("select count(*) from usertask where username = {login}").on(
-            'login -> login).as(scalar[Long].single) == 1
-    }
-  }
 
   def create(label: String, login: String, endate: Option[Date]=None) : Option[Task] = {
       DB.withConnection { implicit c =>
