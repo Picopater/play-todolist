@@ -13,12 +13,23 @@ class UserSpec extends Specification {
 
     "User Model" should {
       "be retrieved by id" in {
-            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+          running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
         
             val Some(user) = User.read(2)
             user.id must equalTo(2)
             user.username must equalTo("dmcc")
           }
       }
+
+      "be created" in {
+         running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+                val Some(user) = User.create("usuarioNuevo")
+
+                val Some(readUser) = User.read(user.id)
+
+                readUser.id must equalTo(user.id)
+                readUser.username must equalTo(user.username)
+            }
+        }
     }
  }
