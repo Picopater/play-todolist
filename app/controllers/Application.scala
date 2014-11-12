@@ -5,6 +5,7 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import models.Task
+import models.User
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import java.util.Date
@@ -62,7 +63,7 @@ object Application extends Controller {
   def newTaskUser(login: String) = Action { implicit request =>
     taskForm.bindFromRequest.fold(
       errors => BadRequest("Error en la peticion"),
-      formData => if (Task.userExists(login)) {
+      formData => if (User.exists(login)) {
                     val result = Task.create(formData.label, login, formData.endate)
                     result match {
                       case Some(x) => Created(Json.toJson(result))

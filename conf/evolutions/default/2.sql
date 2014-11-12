@@ -2,9 +2,9 @@
 
 # --- !Ups
 insert into usertask (id,username) values (0,'guest');
-insert into usertask (id,username) values (1,'usuario1');
-insert into usertask (id,username) values (2,'dmcc');
-insert into usertask (id,username) values (3,'usuario2');
+insert into usertask (username) values ('usuario1');
+insert into usertask (username) values ('dmcc');
+insert into usertask (username) values ('usuario2');
 
 insert into task (label, userid, endate) values ('guest task 1',0,null);
 insert into task (label, userid, endate) values ('guest task 2',0,null);
