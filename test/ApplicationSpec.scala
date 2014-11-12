@@ -15,6 +15,9 @@ import models.Task
 @RunWith(classOf[JUnitRunner])
 class ApplicationSpec extends Specification with JsonMatchers{
 
+    def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str  
+    def strToDate(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
+
   "Application" should {
 
     "send json with all tasks list on / request " in {
@@ -127,6 +130,40 @@ class ApplicationSpec extends Specification with JsonMatchers{
         status(dmccTask) must equalTo(OK)
 
         Task.read(newTask.id) must equalTo(None)
+      }
+    }
+
+    "send json with all user tasks list on /{username}/tasks request with endate" in {
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+         // Añadimos un task a los 3 existentes en la evolucion para comprobar que lo contempla
+         val Some(newTask) = Task.create("nuevo task", "dmcc")
+         val Some(newTask2) = Task.create("nuevo task with date", "dmcc",Some(strToDate("2014-11-08")))
+         
+         val Some(dmccTasks) = route(
+            FakeRequest(GET, "/"+newTask.username+"/tasks?endate="+"2014-11-08")
+            )
+
+         status(dmccTasks) must equalTo(OK)
+         contentType(dmccTasks) must beSome.which(_ == "application/json")
+
+         val resultJson = contentAsJson(dmccTasks)
+         val numGuestTasks = resultJson match {
+            case array: JsArray => array.value.length
+            case _ => None
+         }
+         numGuestTasks must equalTo(2)
+
+         val resultString = Json.stringify(resultJson) 
+
+         resultString must /#(0)/("userid" -> 2)
+         resultString must /#(1)/("userid" -> 2)
+         resultString must /#(0)/("username" -> "dmcc")
+         resultString must /#(1)/("username" -> "dmcc")
+         resultString must /#(0)/("endate" -> "2014-11-08")
+         resultString must /#(1)/("endate" -> "2014-11-08")
+         resultString must /#(0)/("label" -> "dmcc task with date 1")
+         resultString must /#(1)/("label" -> "nuevo task with date")
+
       }
     }
 
