@@ -135,7 +135,7 @@ class ApplicationSpec extends Specification with JsonMatchers{
 
     "send json with all user tasks list on /{username}/tasks request with endate" in {
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
-         // Añadimos un task a los 3 existentes en la evolucion para comprobar que lo contempla
+         // Añadimos dos task a los 3 existentes en la evolucion para comprobar que lo contempla
          val Some(newTask) = Task.create("nuevo task", "dmcc")
          val Some(newTask2) = Task.create("nuevo task with date", "dmcc",Some(strToDate("2014-11-08")))
          
@@ -163,7 +163,41 @@ class ApplicationSpec extends Specification with JsonMatchers{
          resultString must /#(1)/("endate" -> "2014-11-08")
          resultString must /#(0)/("label" -> "dmcc task with date 1")
          resultString must /#(1)/("label" -> "nuevo task with date")
+      }
+    }
 
+    "send json with all user tasks list on /{username}/tasks request without endate" in {
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+         // Añadimos dos task a los 3 existentes en la evolucion para comprobar que lo contempla
+         val Some(newTask) = Task.create("nuevo task", "dmcc")
+         val Some(newTask2) = Task.create("nuevo task with date", "dmcc",Some(strToDate("2014-11-08")))
+         
+         val Some(dmccTasks) = route(
+            FakeRequest(GET, "/"+newTask.username+"/tasks")
+            )
+
+         status(dmccTasks) must equalTo(OK)
+         contentType(dmccTasks) must beSome.which(_ == "application/json")
+
+         val resultJson = contentAsJson(dmccTasks)
+         val numGuestTasks = resultJson match {
+            case array: JsArray => array.value.length
+            case _ => None
+         }
+         numGuestTasks must equalTo(5)
+
+         val resultString = Json.stringify(resultJson) 
+
+         resultString must /#(0)/("userid" -> 2)
+         resultString must /#(1)/("userid" -> 2)
+         resultString must /#(2)/("userid" -> 2)
+         resultString must /#(3)/("userid" -> 2)
+         resultString must /#(4)/("userid" -> 2)
+         resultString must /#(0)/("username" -> "dmcc")
+         resultString must /#(1)/("username" -> "dmcc")
+         resultString must /#(2)/("username" -> "dmcc")
+         resultString must /#(3)/("username" -> "dmcc")
+         resultString must /#(4)/("username" -> "dmcc")
       }
     }
 
