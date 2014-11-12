@@ -23,23 +23,30 @@ class UserSpec extends Specification {
 
       "be created" in {
          running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
-                val Some(user) = User.create("usuarioNuevo")
+             val Some(user) = User.create("usuarioNuevo")
 
-                val Some(readUser) = User.read(user.id)
+             val Some(readUser) = User.read(user.id)
 
-                readUser.id must equalTo(user.id)
-                readUser.username must equalTo(user.username)
-            }
+             readUser.id must equalTo(user.id)
+             readUser.username must equalTo(user.username)
+         }
       }
 
       "be deleted by id" in {
-            running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
-                val Some(user) = User.create("usuarioNuevo2")
+         running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+             val Some(user) = User.create("usuarioNuevo2")
 
-                val rows = User.delete(user.id)
-                User.read(user.id) must equalTo(None)
-                rows must equalTo(1)
+             val rows = User.delete(user.id)
+             User.read(user.id) must equalTo(None)
+             rows must equalTo(1)
           }
+      }
+
+      "be checked if exists" in {
+         running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+            val Some(user) = User.create("usuarioNuevo2")
+            User.exists(user.username) must equalTo(true)
+         }
       }
     }
  }

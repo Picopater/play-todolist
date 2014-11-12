@@ -41,4 +41,11 @@ object User {
        ).executeUpdate()
       }
    }
+
+   def exists(login: String): Boolean = {
+    DB.withConnection { implicit c =>
+      SQL("select count(*) from usertask where username = {login}").on(
+            'login -> login).as(scalar[Long].single) == 1
+    }
+  }
 }
