@@ -237,5 +237,35 @@ class ApplicationSpec extends Specification with JsonMatchers{
       }
     }
 
+    "send json with all task with that {endated} ok /datetasks/{endate}" in {
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+         // Añadimos un task al existente en la evolucion para comprobar que lo contempla
+         val Some(newTask2) = Task.create("nuevo task with date", "guest",Some(strToDate("2014-11-08")))
+         
+         val Some(dmccTasks) = route(
+            FakeRequest(GET, "/datetasks/"+"2014-11-08")
+            )
+
+         status(dmccTasks) must equalTo(OK)
+         contentType(dmccTasks) must beSome.which(_ == "application/json")
+
+         val resultJson = contentAsJson(dmccTasks)
+         val numGuestTasks = resultJson match {
+            case array: JsArray => array.value.length
+            case _ => None
+         }
+         numGuestTasks must equalTo(2)
+
+         val resultString = Json.stringify(resultJson) 
+
+         resultString must /#(0)/("userid" -> 2)
+         resultString must /#(1)/("userid" -> 0)
+         resultString must /#(0)/("username" -> "dmcc")
+         resultString must /#(1)/("username" -> "guest")
+         resultString must /#(0)/("endate" -> "2014-11-08")
+         resultString must /#(1)/("endate" -> "2014-11-08")
+      }
+    }
+
   }
 }
