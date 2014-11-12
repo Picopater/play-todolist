@@ -69,7 +69,7 @@ object Application extends Controller {
                       case None => NotFound("No encuentra el ultimo task que se inserto") // si falla al insertar?
                     }
                   }
-                  else BadRequest("Error: No existe el propietario de la tarea: " + login)
+                  else NotFound("Error: No existe el propietario de la tarea: " + login)
     )
   }
 
